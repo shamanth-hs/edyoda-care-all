@@ -96,7 +96,27 @@ class ElderProfile():
 
     # elder can see requests and accept whome they trus only 1 request can be accepted by elder      
     def show_request(self):
-         sql = '''select '''
+        sql = '''SELECT `PK_user_id`,`name` FROM `users` WHERE `PK_user_id` in (SELECT `FK_user_id` FROM youngers WHERE `PK_younger_id` in 
+            (SELECT `FK_younger_id`FROM request WHERE `FK_elder_id` = %d)); '''
+        val = (self.elder_id)
+        mycursor.execute(sql,val)
+        care_taker = mycursor.fetchall()
+        for i in care_taker:
+            print(i)
+        selected = input("select id to accept request")
+        sql1 = '''SELECT `PK_request_id` FROM `request` WHERE`FK_younger_id`IN
+        (SELECT `PK_younger_id` FROM `youngers` WHERE`FK_user_id` = %d)'''
+        val1= (selected)
+        mycursor.execute(sql1,val1)
+        younger_id = mycursor.fetchone()
+        sql2 = 'UPDATE request set request_status = 1 WHERE FK_elder_id = %s and FK_younger_id = %d'
+        vals = (self.elder_id,younger_id)
+        try:
+            mycursor.execute(sql2,vals)
+            print("Request has been accepted")
+        except Exception:
+            print("Sorry try again")
+
 
     # elder can see name of younger who is taking care of them
     def take_care_name(self):
