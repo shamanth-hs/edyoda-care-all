@@ -96,26 +96,26 @@ class ElderProfile():
 
     # elder can see requests and accept whome they trus only 1 request can be accepted by elder      
     def show_request(self):
-        sql = '''SELECT `PK_user_id`,`name` FROM `users` WHERE `PK_user_id` in (SELECT `FK_user_id` FROM youngers WHERE `PK_younger_id` in 
-            (SELECT `FK_younger_id`FROM request WHERE `FK_elder_id` = %d)); '''
+        sql = f'SELECT `PK_user_id`,`name` FROM `users` WHERE `PK_user_id` in (SELECT `FK_user_id` FROM youngers WHERE `PK_younger_id` in (SELECT `FK_younger_id`FROM request WHERE `FK_elder_id` ={self.elder_id})) '
         val = (self.elder_id)
-        mycursor.execute(sql,val)
+        mycursor.execute(sql)
         care_taker = mycursor.fetchall()
         for i in care_taker:
             print(i)
         selected = input("select id to accept request")
-        sql1 = '''SELECT `PK_request_id` FROM `request` WHERE`FK_younger_id`IN
-        (SELECT `PK_younger_id` FROM `youngers` WHERE`FK_user_id` = %d)'''
+        sql1 = f'SELECT `PK_request_id` FROM `request` WHERE`FK_younger_id`IN(SELECT `PK_younger_id` FROM `youngers` WHERE`FK_user_id` = {selected})'
         val1= (selected)
-        mycursor.execute(sql1,val1)
+        mycursor.execute(sql1)
         younger_id = mycursor.fetchone()
-        sql2 = 'UPDATE request set request_status = 1 WHERE FK_elder_id = %s and FK_younger_id = %d'
+        sql2 = f'UPDATE request set request_status = 1 WHERE FK_elder_id = {self.elder_id} and FK_younger_id = {younger_id}'
         vals = (self.elder_id,younger_id)
         try:
-            mycursor.execute(sql2,vals)
+            mycursor.execute(sql2)
             print("Request has been accepted")
+            self.dashboard_elder()
         except Exception:
             print("Sorry try again")
+            self.dashboard_elder()
 
 
     # elder can see name of younger who is taking care of them

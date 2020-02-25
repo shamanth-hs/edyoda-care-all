@@ -53,12 +53,12 @@ class YoungerProfile():
         for user in user_info:
             print(user[0],user[1])
         elder_id = int(input("Enter Elder id to request"))
-        sql1 = f'''SELECT * FROM request WHERE FK_younger_id = %d AND FK_elder_id = %d'''
+        sql1 = f'SELECT * FROM request WHERE FK_younger_id = {self.younger_id} AND FK_elder_id = {elder_id}'
         val =(self.younger_id,elder_id)
-        mycursor.execute(sql1,val)
+        mycursor.execute(sql1)
         data = mycursor.fetchall()
         if data == None or data == []:
-            query = '''INSERT INTO request (FK_younger_id,FK_elder_id,request_status) VALUES (%d,%d,0);'''
+            query = "INSERT INTO request (FK_younger_id,FK_elder_id,request_status) VALUES (%s,%s,0)"
             values = (self.younger_id,elder_id)
             if(mycursor.execute(query,values)):
                 print("Request has been sent to the elder waiting for their aproval")
