@@ -58,12 +58,13 @@ class YoungerProfile():
         mycursor.execute(sql1)
         data = mycursor.fetchall()
         if data == None or data == []:
-            query = "INSERT INTO request (FK_younger_id,FK_elder_id,request_status) VALUES (%s,%s,0)"
-            values = (self.younger_id,elder_id)
-            if(mycursor.execute(query,values)):
+            query = "INSERT INTO request (FK_younger_id,FK_elder_id,request_status) VALUES (%s,%s,%s)"
+            values = (self.younger_id,elder_id,0)
+            try:
+                mycursor.execute(query,values)
                 print("Request has been sent to the elder waiting for their aproval")
                 self.dashboard_younger()
-            else:
+            except Exception:
                 print("Cannot perform request please try again later")
         else:
             print("You have already requested for this following elder")
@@ -75,9 +76,9 @@ class YoungerProfile():
         review = input("Please enter your review")
         ratings = int(input("Enter rating in range 0 to 10"))
         # change this query
-        sql = 'SELECT `FK_user_id` FROM elders WHERE `PK_elder_id` = (SELECT `PK_elder_id` FROM elders WHERE `FK_younger_id` = %d)'
+        sql = f'SELECT `FK_user_id` FROM elders WHERE `PK_elder_id` = (SELECT `PK_elder_id` FROM elders WHERE `FK_younger_id` = {self.younger_id})'
         val = (self.younger_id)
-        mycursor.execute(sql,val)
+        mycursor.execute(sql)
         care_taker_id = mycursor.fetchall()
         review_query = 'INSERT INTO `reviews` (`FK_user_id`,`review`,`rating`,`review_by`) VALUES (%d,%s,%d,%s)'
         vals = (care_taker_id,review,ratings,self.younger_name)
